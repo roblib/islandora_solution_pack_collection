@@ -43,8 +43,8 @@ function islandora_basic_collection_migrate_item_form($form, &$form_state, $isla
  * @param array $form_state
  *   The context of this form.
  */
-function islandora_basic_collection_migrate_item_form_validate($form, &$form_state) {
-  $new_collection = islandora_object_load($form_state['values']['new_collection_name']);
+function islandora_basic_collection_migrate_item_form_validate($form, &$form_state, $collection = NULL) {
+  $new_collection = isset($collection) ? $collection : islandora_object_load($form_state['values']['new_collection_name']);
   $collection_models = islandora_basic_collection_get_collection_content_models();
   $is_a_collection = FALSE;
   if (is_object($new_collection)) {

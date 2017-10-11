@@ -291,8 +291,8 @@ function islandora_basic_collection_migrate_children_batch(AbstractObject $sourc
 function islandora_basic_collection_migrate_children_batch_operation(AbstractObject $source, AbstractObject $destination, array $children, array &$context) {
   $child = islandora_basic_collection_start_operation($children, $context);
   if ($child && $child = islandora_object_load($child)) {
-    islandora_basic_collection_add_to_collection($child, $destination);
     islandora_basic_collection_remove_from_collection($child, $source);
+    islandora_basic_collection_add_to_collection($child, $destination);
   }
   if (islandora_basic_collection_end_operation($context)) {
     drupal_set_message(format_plural(count($children),

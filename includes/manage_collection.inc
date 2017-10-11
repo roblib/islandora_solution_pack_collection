@@ -368,12 +368,8 @@ function islandora_basic_collection_share_children_form(array $form, array &$for
       'element' => 0,
       'fragment' => $fragment,
     )),
-    'collection' => array(
-      '#title' => t('Share members with collection'),
-      '#description' => t("Members can be shared with any number of collections."),
-      '#type' => 'select',
-      '#options' => islandora_basic_collection_get_other_collections_as_form_options($object),
-    ),
+    'collection' => islandora_basic_collection_build_collection_form_element($object, t('Share members with collection'),
+      t('Members can be shared with any number of collections.')),
     'submit' => array(
       '#type' => 'submit',
       '#value' => t('Share selected objects'),
@@ -383,6 +379,39 @@ function islandora_basic_collection_share_children_form(array $form, array &$for
       '#value' => t('Share All Objects'),
     ),
   );
+}
+
+/**
+ * Build the collection form element.
+ *
+ * Both $title and $description should be run through the t function
+ * to create the finalized strings before calling this function.
+ *
+ * @param AbstractObject $object
+ *   The collection object.
+ * @param string $title
+ *   The form elements title.
+ * @param string $description
+ *   The form elements description.
+ *
+ * @return array
+ *   A Drupal form element, either a select list or textfield with autocomplete.
+ */
+function islandora_basic_collection_build_collection_form_element($object, $title, $description) {
+  $collections = array(
+    '#title' => $title,
+    '#description' => $description,
+    '#autocomplete_path' => 'islandora/basic_collection/find_collections',
+    '#type' => 'textfield',
+    '#required' => TRUE,
+  );
+
+  if (!variable_get('islandora_basic_collection_enable_typeahead_for_collection_lists', FALSE)) {
+    $collections['#type'] = 'select';
+    $collections['#options'] = islandora_basic_collection_get_other_collections_as_form_options($object);
+    unset($collections['#autocomplete_path']);
+  }
+  return $collections;
 }
 
 /**
@@ -444,12 +473,8 @@ function islandora_basic_collection_migrate_children_form(array $form, array &$f
       'element' => 1,
       'fragment' => $fragment,
     )),
-    'collection' => array(
-      '#title' => t('Migrate members to collection'),
-      '#description' => t('Removes members from their current collection (%label) and adds them to the selected collection.', array('%label' => $object->label)),
-      '#type' => 'select',
-      '#options' => islandora_basic_collection_get_other_collections_as_form_options($object),
-    ),
+    'collection' => islandora_basic_collection_build_collection_form_element($object, t('Migrate members to collection'),
+      t('Removes members from their current collection (%label) and adds them to the selected collection.', array('%label' => $object->label))),
     'submit' => array(
       '#type' => 'submit',
       '#value' => t('Migrate selected objects'),
@@ -556,9 +581,11 @@ function islandora_basic_collection_delete_children_form_submit(array $form, arr
  *   Whether the form is valid or not.
  */
 function islandora_basic_collection_validate_form(array $form_state) {
+  module_load_include('inc', 'islandora_basic_collection', 'includes/migrate.form');
   $new_collection = $form_state['values']['collection'];
+  $new_collection_object = islandora_object_load($new_collection);
+  islandora_basic_collection_migrate_item_form_validate(NULL, $form_state, $new_collection_object);
   $clicked_button = end($form_state['clicked_button']['#parents']);
-
   if ($clicked_button == 'submit_all') {
     $source_collection = $form_state['collection'];
     $query = <<<EOT

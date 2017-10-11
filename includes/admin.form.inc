@@ -82,6 +82,12 @@ function islandora_basic_collection_admin(array $form, array &$form_state) {
       '#default_value' => variable_get('islandora_basic_collection_disable_collection_policy_delete', TRUE),
       '#description' => t("Disables the 'delete' link for the COLLECTION_POLICY datastream."),
     ),
+    'islandora_basic_collection_enable_typeahead_for_collection_lists' => array(
+      '#type' => 'checkbox',
+      '#title' => t('Enable collection autocomplete'),
+      '#default_value' => variable_get('islandora_basic_collection_enable_typeahead_for_collection_lists', FALSE),
+      '#description' => t("Replace collection select lists (dropdowns) with autocomplete text fields."),
+    ),
     // Metadata display.
     'metadata_display_fieldset' => array(
       '#type' => 'fieldset',
