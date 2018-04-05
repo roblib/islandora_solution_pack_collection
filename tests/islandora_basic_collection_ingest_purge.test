@@ -41,7 +41,6 @@ class IslandoraBasicCollectionIngestTestCase extends IslandoraCollectionWebTestC
     $this->drupalLogin($user);
 
     // Add a collection.
-    $label = $this->randomName(16);
     $pid = 'islandora:' . $this->randomName();
     $this->drupalPost('islandora/object/islandora:root/manage/overview/ingest', array('pid' => $pid), 'Ingest');
 
